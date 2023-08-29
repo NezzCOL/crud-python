@@ -1,92 +1,76 @@
 import pyodbc
 
 DB = 'sena'
-SERVER = 'DESKTOP-NEJ0TUM\SQLEXPRESS'
+SERVER = 'DESKTOP-RGO03S4\MSSQLSERVER3'
 
 try:
-    conn = pyodbc.connect (
-        'DRIVER={SQL Server};'
-        f'SERVER={SERVER};'
-        f'DATABASE={DB};'
-        'Trusted_Connection=yes;'
-    )
-    print('Conexión exitosa', conn)
-except Exception as err:
-    print(f'Error de conexión {err}')
+    conex = pyodbc.connect ('DRIVER={SQL Server};'f'SERVER={SERVER};'f'DATABASE={DB};''Trusted_Connection=yes;')
+    print('Conexión exitosa', conex)
+except Exception:
+    print(f'Error de conexión {Exception}')
 
 def Consulta():
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM tps')
-    row = cur.fetchall()
-
-    while row:
-        print (
-            '---- CONSULTA DE DATOS ----\n'
-              f'{row}\n'
-        )
-        break
-
-def Eliminar():
-    id = int(input('Ingrese el número del id que desea eliminar: '))
-
-    res = conn.cursor()
-    sql = ('DELETE FROM tps WHERE id={}').format(id)
-    res.execute(sql)
-
-    conn.commit()
-    row = res.rowcount
-
-    print(f'Registro del id {row} eliminado')
+    res=conex.cursor()
+    res.execute("select * from tps35")
+    datos=res.fetchall()
+    #res.close()
+    #conex.close()
+    for i in datos:
+        print(i)
 
 def Insertar():
-    id = int(input('Ingrese un id válido: '))
-    nombre = str(input('Ingrese un nombre: '))
-    apellido = str(input('Ingrese un apellido: '))
-    telefono = int(input('Ingrese un número de telefono: '))
+    id=int(input('Ingrese un id valido: '))
+    nombre=str(input('Ingrese un nombre: '))
+    apellido=str(input('Ingrese un apellido: '))
+    telefono=int(input('Ingresse un número de telefono: '))
 
-    res = conn.cursor()
-    res.execute(f"INSERT INTO tps(id, nombre, apellido, telefono) VALUES({id},'{nombre}', '{apellido}', {telefono})")
-    conn.commit()
+    res=conex.cursor()
+    res.execute(f"INSERT INTO tps35(id, nombre, apellido, telefono) VALUES({id},'{nombre}', '{apellido}', {telefono})")
+    conex.commit()
+    fila=res.rowcount
+    print(fila,"Registro insertado")
 
-    row = res.rowcount
-    print(f'{row} registro insertado')
+def Eliminar():
+    id=int(input('Ingrese el id que desea eliminar: '))
+    res=conex.cursor()
+    sql=("delete from tps35 where id={}").format(id)
+    res.execute(sql)
+    conex.commit()
+    fila=res.rowcount
+    print("Usuario borrado",fila)
 
-def Editar():
-    id = int(input('Seleccione el id del dato que quiere actualizar: '))
-    nombre = str(input('Ingrese el nuevo nombre: '))
-    apellido = str(input('Ingrese el nuevo apellido: '))
-    telefono = int(input('Ingrese el nuevo número de teléfono: '))
-
-    cur = conn.cursor()
-    sql = 'UPDATE tps SET nombre=?, apellido=?, telefono=? WHERE id=?'
-
-    cur.execute(sql, (nombre, apellido, telefono, id))
-    conn.commit()
-
-    row = cur.rowcount
-    print(row)
+def Actualizar():
+    id=int(input('Seleccione el id a actualizar: '))
+    nombre=str(input('Ingrese un nuevo nombre: '))
+    apellido=str(input('Ingrese un nuevo apellido: '))
+    telefono=int(input('Ingrese un nuevo numero de telefono: '))
+    res=conex.cursor()
+    sql=(f"UPDATE tps35 SET nombre='{nombre}', apellido='{apellido}', telefono={telefono} WHERE id={id}")
+    res.execute(sql)
+    conex.commit()
+    fila=res.rowcount
+    print("Datos actualizados",fila)
 
 while True:
     print('\nQue desea realizar \n')
-
     print('1. Consultar datos de la tabla')
     print('2. Editar datos de la tabla')
     print('3. Insertar datos en la tabla')
     print('4. Eliminar datos de la tabla')
     print('0. Finalizar programa')
 
-    opcion = int(input('\nEscoja una opción: '))
+    opcion = int(input('\nElija una opción: '))
 
     if opcion == 1:
         Consulta()
     if opcion == 2:
-        Editar()
+        Actualizar()
     if opcion == 3:
         Insertar()
     if opcion == 4:
         Eliminar()
     elif opcion == 0:
-        print('Adios')
+        print('\nAdios\n')
         break
     else:
-        print('☝️')
+        print('\nHola de nuevo\n')
